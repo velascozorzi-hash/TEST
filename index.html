@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L'Avenue — Brasserie Française</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:       #c9a560;
+      --gold-light: #dbbe7a;
+      --dark:       #0e0c09;
+      --dark-2:     #1a1610;
+      --dark-3:     #252018;
+      --cream:      #f2e8d8;
+      --text:       #cfc3b0;
+      --muted:      #7a6e5f;
+      --border:     rgba(201,165,96,.16);
+
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans:  'DM Sans', system-ui, sans-serif;
+
+      --ease: cubic-bezier(.25,.1,.25,1);
+      --max: 1300px;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ────────────────────────── NAV ── */
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 200;
+      padding: 1.6rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background .4s var(--ease), padding .4s var(--ease), border-color .4s;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(10,8,5,.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 1rem 2.5rem;
+      border-color: var(--border);
+    }
+
+    .nav-logo { text-decoration: none; }
+    .nav-logo-name {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--cream);
+      letter-spacing: .06em;
+      display: block;
+      line-height: 1;
+    }
+    .nav-logo-sub {
+      font-size: .6rem;
+      letter-spacing: .36em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: .2rem;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+    }
+    .nav-links a {
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+      position: relative;
+      transition: color .3s var(--ease);
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0;
+      width: 0; height: 1px;
+      background: var(--gold);
+      transition: width .35s var(--ease);
+    }
+    .nav-links a:hover { color: var(--cream); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      color: var(--gold) !important;
+      border: 1px solid var(--border) !important;
+      padding: .55rem 1.35rem;
+      transition: background .3s var(--ease), border-color .3s, color .3s !important;
+    }
+    .nav-cta:hover { background: var(--gold) !important; color: var(--dark) !important; border-color: var(--gold) !important; }
+    .nav-cta::after { display: none !important; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      z-index: 201;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 1px;
+      background: var(--cream);
+      transition: transform .35s var(--ease), opacity .35s;
+    }
+
+    /* ────────────────────────── HERO ── */
+    .hero {
+      position: relative;
+      height: 100svh;
+      min-height: 620px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #1a130a;
+      background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&auto=format&q=75');
+      background-size: cover;
+      background-position: center 35%;
+      will-change: transform;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(8,6,3,.97) 0%,
+        rgba(8,6,3,.55) 45%,
+        rgba(8,6,3,.15) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 2.5rem 6.5rem;
+    }
+
+    .hero-tag {
+      font-size: .65rem;
+      letter-spacing: .45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      opacity: 0;
+      animation: fadeSlide .8s .3s var(--ease) forwards;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 36px; height: 1px;
+      background: var(--gold);
+      opacity: .5;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(3.8rem, 11vw, 9rem);
+      font-weight: 400;
+      color: var(--cream);
+      line-height: .9;
+      letter-spacing: -.02em;
+      margin-bottom: 2.4rem;
+      opacity: 0;
+      animation: fadeSlide .9s .5s var(--ease) forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: flex-end;
+      gap: 2.5rem;
+      opacity: 0;
+      animation: fadeSlide .8s .75s var(--ease) forwards;
+    }
+
+    .hero-description {
+      max-width: 440px;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--text);
+    }
+
+    /* ────────────────────────── BUTTONS ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      padding: 1.05rem 2rem;
+      background: var(--gold);
+      color: var(--dark);
+      font-family: var(--sans);
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: color .35s var(--ease);
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold-light);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .35s var(--ease);
+    }
+    .btn-primary:hover::before { transform: scaleX(1); }
+    .btn-primary > * { position: relative; z-index: 1; }
+    .btn-primary .ico { transition: transform .35s var(--ease); }
+    .btn-primary:hover .ico { transform: translateX(4px); }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      padding: .85rem 1.8rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: border-color .3s var(--ease), color .3s var(--ease);
+      white-space: nowrap;
+    }
+    .btn-outline .ico { transition: transform .35s var(--ease); }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-outline:hover .ico { transform: translateX(4px); }
+
+    /* ────────────────────────── STATS BAND ── */
+    .band {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 2.2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .band-item {
+      flex: 1;
+      max-width: 220px;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: .3rem;
+      padding: 0 2rem;
+      border-right: 1px solid var(--border);
+    }
+    .band-item:last-child { border-right: none; }
+    .band-num {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .band-label {
+      font-size: .62rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ────────────────────────── ABOUT ── */
+    .about {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 7rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7rem;
+      align-items: center;
+    }
+    .about-quote {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 400;
+      color: var(--cream);
+      line-height: 1.3;
+      font-style: italic;
+      padding-left: 2rem;
+      border-left: 2px solid var(--gold);
+    }
+    .about-kicker {
+      font-size: .62rem;
+      letter-spacing: .38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.4rem;
+    }
+    .about-body {
+      font-size: .98rem;
+      color: var(--text);
+      line-height: 1.9;
+    }
+    .about-body + .about-body { margin-top: 1.2rem; }
+
+    /* ────────────────────────── SECTION HEADER ── */
+    .section-intro {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    .section-kicker {
+      font-size: .62rem;
+      letter-spacing: .42em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-kicker::before,
+    .section-kicker::after {
+      content: '';
+      width: 30px; height: 1px;
+      background: var(--gold);
+      opacity: .4;
+    }
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: -.01em;
+      line-height: 1.1;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    /* ────────────────────────── MENU ── */
+    .menu-section { padding: 0 2.5rem 8rem; }
+
+    .menu-grid {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.45fr 1fr 1fr;
+      grid-template-rows: 540px;
+      gap: 3px;
+    }
+
+    .dish-card {
+      position: relative;
+      overflow: hidden;
+      background: var(--dark-2);
+      cursor: pointer;
+    }
+    .dish-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      filter: brightness(.75) saturate(.85);
+      transition: filter .55s var(--ease), transform .65s var(--ease);
+    }
+    .dish-card:hover .dish-img {
+      filter: brightness(.55) saturate(.8);
+      transform: scale(1.04);
+    }
+
+    .dish-body {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2.2rem;
+      background: linear-gradient(to top, rgba(8,6,3,.92) 0%, transparent 60%);
+      transition: background .4s var(--ease);
+    }
+    .dish-card:hover .dish-body {
+      background: linear-gradient(to top, rgba(8,6,3,.96) 0%, rgba(8,6,3,.1) 65%);
+    }
+
+    .dish-num {
+      font-size: .6rem;
+      letter-spacing: .35em;
+      color: var(--gold);
+      opacity: .65;
+      margin-bottom: .45rem;
+    }
+    .dish-name {
+      font-family: var(--serif);
+      font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+      font-weight: 400;
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: .5rem;
+    }
+    .dish-desc {
+      font-size: .8rem;
+      line-height: 1.65;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .35s var(--ease), transform .35s var(--ease);
+      margin-bottom: 1.1rem;
+    }
+    .dish-card:hover .dish-desc { opacity: .78; transform: translateY(0); }
+
+    .dish-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dish-price {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--gold);
+    }
+    .dish-tag {
+      font-size: .58rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: .22rem .65rem;
+    }
+
+    .menu-foot {
+      max-width: var(--max);
+      margin: 3rem auto 0;
+      text-align: center;
+    }
+
+    /* ────────────────────────── RESERVATION CTA ── */
+    .resa {
+      max-width: var(--max);
+      margin: 0 auto 8rem;
+      padding: 0 2.5rem;
+    }
+    .resa-inner {
+      background: var(--dark-2);
+      border: 1px solid var(--border);
+      padding: 4rem 4.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 3rem;
+    }
+    .resa-title {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: .7rem;
+    }
+    .resa-sub {
+      font-size: .88rem;
+      color: var(--muted);
+    }
+    .resa-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* ────────────────────────── FOOTER ── */
+    .footer {
+      background: #07060302;
+      border-top: 1px solid var(--border);
+      padding: 5.5rem 2.5rem 3rem;
+      background-color: #08070405;
+    }
+    .footer { background: #09080505; }
+
+    .footer-inner { max-width: var(--max); margin: 0 auto; }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1.2fr;
+      gap: 5rem;
+      padding-bottom: 4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .footer-brand {
+      font-family: var(--serif);
+      font-size: 2.1rem;
+      font-weight: 400;
+      color: var(--cream);
+      letter-spacing: .04em;
+      margin-bottom: .4rem;
+    }
+    .footer-brand-sub {
+      font-size: .6rem;
+      letter-spacing: .36em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.6rem;
+    }
+    .footer-tagline {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 300px;
+    }
+
+    .footer-col-title {
+      font-size: .6rem;
+      letter-spacing: .38em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.4rem;
+    }
+    .footer-address {
+      font-size: .88rem;
+      color: var(--text);
+      line-height: 2;
+      font-style: normal;
+    }
+    .footer-address a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .3s var(--ease);
+    }
+    .footer-address a:hover { color: var(--gold); }
+
+    .footer-hours { list-style: none; }
+    .footer-hours li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      font-size: .83rem;
+      padding: .5rem 0;
+      border-bottom: 1px solid rgba(201,165,96,.06);
+    }
+    .footer-hours li:last-child { border-bottom: none; }
+    .foot-day { color: var(--muted); }
+    .foot-time { color: var(--text); text-align: right; }
+    .foot-closed { color: var(--muted); opacity: .45; text-align: right; }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .footer-copy { font-size: .68rem; color: var(--muted); opacity: .55; }
+    .footer-social { display: flex; gap: 1.8rem; }
+    .footer-social a {
+      font-size: .62rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .3s var(--ease);
+    }
+    .footer-social a:hover { color: var(--gold); }
+
+    /* ────────────────────────── ANIMATIONS ── */
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .75s var(--ease), transform .75s var(--ease);
+    }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal.d1 { transition-delay: .1s; }
+    .reveal.d2 { transition-delay: .2s; }
+    .reveal.d3 { transition-delay: .3s; }
+
+    /* ────────────────────────── MOBILE MENU ── */
+    @media (max-width: 960px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,8,5,.97);
+        backdrop-filter: blur(16px);
+        align-items: center;
+        justify-content: center;
+        gap: 2.8rem;
+        z-index: 200;
+      }
+      .nav-links.open a { font-size: 1.1rem; }
+      .hamburger { display: flex; }
+      .hero-bottom { grid-template-columns: 1fr; }
+    }
+
+    /* ────────────────────────── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .about {
+        grid-template-columns: 1fr;
+        gap: 3.5rem;
+        padding: 5rem 2rem;
+      }
+      .menu-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      .menu-grid .dish-card { height: 340px; }
+      .dish-desc { opacity: .72; transform: none; }
+      .resa-inner {
+        grid-template-columns: 1fr;
+        padding: 3rem 2rem;
+      }
+      .footer-top {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+      .band-item { padding: 0 1rem; }
+    }
+
+    @media (max-width: 640px) {
+      .nav { padding: 1.2rem 1.5rem; }
+      .nav.scrolled { padding: .9rem 1.5rem; }
+      .hero-content { padding: 0 1.5rem 4.5rem; }
+      .about { padding: 4rem 1.5rem; }
+      .menu-section { padding: 0 1.5rem 5rem; }
+      .resa { padding: 0 1.5rem; }
+      .footer { padding: 4rem 1.5rem 2.5rem; }
+      .band { padding: 1.8rem 1.5rem; gap: 0; }
+      .band-item { padding: 0 .8rem; min-width: 80px; }
+      .band-num { font-size: 1.5rem; }
+      .section-intro { padding: 0 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════ NAVIGATION ══════════════ -->
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-logo" aria-label="L'Avenue — accueil">
+      <span class="nav-logo-name">L'Avenue</span>
+      <span class="nav-logo-sub">Brasserie &middot; Paris</span>
+    </a>
+
+    <ul class="nav-links" id="navLinks" role="list">
+      <li><a href="#menu">La Carte</a></li>
+      <li><a href="#about">À Propos</a></li>
+      <li><a href="#reservation" class="nav-cta">Réserver</a></li>
+    </ul>
+
+    <button class="hamburger" id="hamburger" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" aria-label="Section principale">
+    <div class="hero-bg" id="heroBg" role="img" aria-label="Ambiance intérieure de L'Avenue"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <p class="hero-tag">Établissement depuis 2009</p>
+
+      <h1 class="hero-title">
+        L'Avenue<br>
+        <em>Brasserie</em>
+      </h1>
+
+      <div class="hero-bottom">
+        <p class="hero-description">
+          Une table conviviale et généreuse au cœur de Paris.
+          Cuisine de brasserie revisitée avec soin, vins naturels
+          et atmosphère chaleureuse du matin au soir.
+        </p>
+        <div>
+          <a href="#reservation" class="btn-primary">
+            <span>Réserver une table</span>
+            <svg class="ico" width="15" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+              <path d="M1 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ STATS BAND ══════════════ -->
+  <div class="band" role="list" aria-label="Chiffres clés">
+    <div class="band-item" role="listitem">
+      <span class="band-num">15</span>
+      <span class="band-label">Ans d'histoire</span>
+    </div>
+    <div class="band-item" role="listitem">
+      <span class="band-num">48</span>
+      <span class="band-label">Couverts en salle</span>
+    </div>
+    <div class="band-item" role="listitem">
+      <span class="band-num">6j/7</span>
+      <span class="band-label">Ouverture</span>
+    </div>
+    <div class="band-item" role="listitem">
+      <span class="band-num">100%</span>
+      <span class="band-label">Produits de saison</span>
+    </div>
+  </div>
+
+  <!-- ══════════════ ABOUT ══════════════ -->
+  <section class="about" id="about" aria-label="À propos de L'Avenue">
+    <blockquote class="about-quote reveal">
+      La vraie cuisine,<br>c'est celle qu'on partage.
+    </blockquote>
+
+    <div class="reveal d1">
+      <p class="about-kicker">Notre histoire</p>
+      <p class="about-body">
+        Nichée au cœur du 8e arrondissement, L'Avenue est bien plus qu'un restaurant :
+        c'est un lieu de vie. Depuis 2009, nous défendons une cuisine franche et généreuse —
+        celle des brasseries d'antan, revisitée avec les produits du marché.
+      </p>
+      <p class="about-body" style="margin-top:1.2rem">
+        Le matin, les habitués s'y retrouvent pour le café et les viennoiseries.
+        Le midi, on déjeune en terrasse. Le soir, on s'attarde autour d'une bonne bouteille.
+        L'Avenue, c'est ça.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ MENU PREVIEW ══════════════ -->
+  <section class="menu-section" id="menu" aria-label="Nos plats signatures">
+    <div class="section-intro">
+      <span class="section-kicker reveal">Nos signatures</span>
+      <h2 class="section-title reveal d1">La <em>Carte</em></h2>
+    </div>
+
+    <div class="menu-grid">
+      <!-- Plat 1 -->
+      <article class="dish-card reveal" tabindex="0" role="article" aria-label="Entrecôte Maturée">
+        <img
+          class="dish-img"
+          src="https://images.unsplash.com/photo-1558030006-450675393462?w=900&auto=format&q=75"
+          alt="Entrecôte maturée, beurre maître d'hôtel et frites maison"
+          loading="lazy"
+        >
+        <div class="dish-body" aria-hidden="true">
+          <span class="dish-num">01</span>
+          <h3 class="dish-name">Entrecôte<br>Maturée</h3>
+          <p class="dish-desc">45 jours de maturation, beurre maître d'hôtel, frites maison dorées à l'huile de canard.</p>
+          <div class="dish-foot">
+            <span class="dish-price">34 €</span>
+            <span class="dish-tag">Viande</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plat 2 -->
+      <article class="dish-card reveal d1" tabindex="0" role="article" aria-label="Moules Marinières">
+        <img
+          class="dish-img"
+          src="https://images.unsplash.com/photo-1559847844-5315695dadae?w=800&auto=format&q=75"
+          alt="Moules marinières, vin blanc et crème fraîche"
+          loading="lazy"
+        >
+        <div class="dish-body" aria-hidden="true">
+          <span class="dish-num">02</span>
+          <h3 class="dish-name">Moules<br>Marinières</h3>
+          <p class="dish-desc">Moules de bouchot, vin blanc sec, crème fraîche, persil plat et échalotes confites.</p>
+          <div class="dish-foot">
+            <span class="dish-price">22 €</span>
+            <span class="dish-tag">Mer</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Plat 3 -->
+      <article class="dish-card reveal d2" tabindex="0" role="article" aria-label="Tartare de Bœuf">
+        <img
+          class="dish-img"
+          src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&q=75"
+          alt="Tartare de bœuf haché au couteau, câpres et jaune d'œuf"
+          loading="lazy"
+        >
+        <div class="dish-body" aria-hidden="true">
+          <span class="dish-num">03</span>
+          <h3 class="dish-name">Tartare<br>de Bœuf</h3>
+          <p class="dish-desc">Haché au couteau, façon classique ou épicée, câpres, cornichons, jaune d'œuf, toasts grillés.</p>
+          <div class="dish-foot">
+            <span class="dish-price">24 €</span>
+            <span class="dish-tag">Signature</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="menu-foot reveal">
+      <a href="#" class="btn-outline">
+        Voir la carte complète
+        <svg class="ico" width="15" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+          <path d="M1 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══════════════ RESERVATION ══════════════ -->
+  <div class="resa" id="reservation">
+    <div class="resa-inner reveal">
+      <div>
+        <h2 class="resa-title">Réservez votre table</h2>
+        <p class="resa-sub">Disponible du mardi au dimanche, midi et soir. Réservation conseillée.</p>
+      </div>
+      <div class="resa-actions">
+        <a href="tel:+33142881090" class="btn-outline">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.95 10.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012.86 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          +33 1 42 88 10 90
+        </a>
+        <a href="#" class="btn-primary">
+          <span>Réserver en ligne</span>
+          <svg class="ico" width="15" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true">
+            <path d="M1 5h14M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+
+        <div>
+          <p class="footer-brand">L'Avenue</p>
+          <p class="footer-brand-sub">Brasserie Française &middot; Paris</p>
+          <p class="footer-tagline">
+            Une cuisine sincère, des produits du marché, et une salle
+            où il fait bon s'attarder. Bienvenue à L'Avenue.
+          </p>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Nous trouver</p>
+          <address class="footer-address">
+            41 Avenue Montaigne<br>
+            75008 Paris<br>
+            <br>
+            <a href="tel:+33142881090">+33 1 42 88 10 90</a><br>
+            <a href="mailto:contact@lavenue-paris.fr">contact@lavenue-paris.fr</a>
+          </address>
+        </div>
+
+        <div>
+          <p class="footer-col-title">Horaires d'ouverture</p>
+          <ul class="footer-hours">
+            <li>
+              <span class="foot-day">Lundi</span>
+              <span class="foot-closed">Fermé</span>
+            </li>
+            <li>
+              <span class="foot-day">Mar &ndash; Ven</span>
+              <span class="foot-time">12h&thinsp;&ndash;&thinsp;14h30 &nbsp;·&nbsp; 19h&thinsp;&ndash;&thinsp;23h</span>
+            </li>
+            <li>
+              <span class="foot-day">Samedi</span>
+              <span class="foot-time">12h&thinsp;&ndash;&thinsp;15h &nbsp;·&nbsp; 19h&thinsp;&ndash;&thinsp;23h30</span>
+            </li>
+            <li>
+              <span class="foot-day">Dimanche</span>
+              <span class="foot-time">12h&thinsp;&ndash;&thinsp;16h</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2024 L'Avenue Brasserie Française. Tous droits réservés.</p>
+        <nav class="footer-social" aria-label="Réseaux sociaux">
+          <a href="#" aria-label="Instagram">Instagram</a>
+          <a href="#" aria-label="Facebook">Facebook</a>
+          <a href="#" aria-label="TripAdvisor">TripAdvisor</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // ── Nav scroll state ──
+      const nav = document.getElementById('nav');
+      const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 60);
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // ── Hero parallax ──
+      const heroBg = document.getElementById('heroBg');
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        if (y < window.innerHeight) {
+          heroBg.style.transform = `translateY(${y * 0.28}px)`;
+        }
+      }, { passive: true });
+
+      // ── Hamburger ──
+      const hamburger = document.getElementById('hamburger');
+      const navLinks  = document.getElementById('navLinks');
+      hamburger.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        hamburger.setAttribute('aria-expanded', isOpen);
+        const [s1, , s3] = hamburger.querySelectorAll('span');
+        const mid = hamburger.querySelectorAll('span')[1];
+        s1.style.transform  = isOpen ? 'translateY(6px) rotate(45deg)' : '';
+        mid.style.opacity   = isOpen ? '0' : '1';
+        s3.style.transform  = isOpen ? 'translateY(-6px) rotate(-45deg)' : '';
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+      });
+      navLinks.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          navLinks.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+          hamburger.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = '1'; });
+          document.body.style.overflow = '';
+        });
+      });
+
+      // ── Scroll reveal ──
+      const revealEls = document.querySelectorAll('.reveal');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -36px 0px' });
+      revealEls.forEach(el => obs.observe(el));
+
+      // ── Smooth anchor scroll ──
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          const id = a.getAttribute('href');
+          if (id === '#') return;
+          const target = document.querySelector(id);
+          if (target) {
+            e.preventDefault();
+            const offset = nav.offsetHeight + 16;
+            const top = target.getBoundingClientRect().top + window.scrollY - offset;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
