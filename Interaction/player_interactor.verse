@@ -6,7 +6,7 @@ using { /UnrealEngine.com/Temporary/SpatialMath }
 using { /UnrealEngine.com/Temporary/UI }
 
 player_interactor_state := class<unique>:
-    var CurrentTarget : ?interactable = false
+    var CurrentTarget : ?interactable_component = false
     var CurrentWidget : ?widget = false
 
 player_interactor := class(creative_device):
@@ -56,8 +56,8 @@ player_interactor := class(creative_device):
         else:
             ClearTarget(P, State)
 
-    FindBest(Agent : agent, Origin : vector3, Forward : vector3, CosThreshold : float) : ?interactable =
-        var Best : ?interactable = false
+    FindBest(Agent : agent, Origin : vector3, Forward : vector3, CosThreshold : float) : ?interactable_component =
+        var Best : ?interactable_component = false
         var BestDot : float = CosThreshold
         for (I : Manager.GetAll()):
             if (I.CanInteract(Agent)):
@@ -75,8 +75,8 @@ player_interactor := class(creative_device):
                         set BestDot = D
         Best
 
-    ApplyTarget(P : player, State : player_interactor_state, NewTarget : ?interactable) : void =
-        # Identity-change only: si la cible est la même, on ne touche pas au widget.
+    ApplyTarget(P : player, State : player_interactor_state, NewTarget : ?interactable_component) : void =
+        # Identity-change only : si la cible n'a pas changé, on ne touche pas au widget.
         if (Current := State.CurrentTarget?, Next := NewTarget?, Current = Next):
             return
 
@@ -97,7 +97,7 @@ player_interactor := class(creative_device):
         set State.CurrentTarget = false
 
     OnInteractPressed(Agent : agent) : void =
-        # Ré-évalue la cible au moment du press pour absorber la latence de la view replication.
+        # Ré-évalue la cible au moment du press pour absorber la latence de réplication.
         if (P := player[Agent], Char := P.GetFortCharacter[],
             not Char.IsInVehicle[],
             ViewLoc := Char.GetViewLocation[], ViewRot := Char.GetViewRotation[]):
@@ -111,7 +111,7 @@ player_interactor := class(creative_device):
                 else:
                     spawn { HoldInteract(Agent, Target, Duration) }
 
-    HoldInteract(Agent : agent, Target : interactable, Duration : float)<suspends> : void =
+    HoldInteract(Agent : agent, Target : interactable_component, Duration : float)<suspends> : void =
         var Elapsed : float = 0.0
         Step := 1.0 / TickRateHz
         loop:

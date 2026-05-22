@@ -1,11 +1,13 @@
-using { /Fortnite.com/Devices }
+using { /Verse.org/SceneGraph }
 using { /Verse.org/Simulation }
 using { /UnrealEngine.com/Temporary/SpatialMath }
 using { /UnrealEngine.com/Temporary/UI }
 
-# Classe de base à étendre par chaque type d'interaction concret.
-# Drop ce device sur n'importe quelle entité pour la rendre interactable.
-interactable_component<abstract> := class(creative_device, interactable):
+# Composant scene graph abstrait — à drop sur n'importe quelle entité
+# qu'on veut rendre interactable. Les méthodes "virtuelles" (OnInteract,
+# CanInteract, GetPromptWidget, …) sont surchargées par les composants
+# concrets (pickup_interactable, ui_interactable, toggle_interactable …).
+interactable_component<abstract> := class(component):
     @editable
     Manager : interaction_manager = interaction_manager{}
 
@@ -15,22 +17,28 @@ interactable_component<abstract> := class(creative_device, interactable):
     @editable
     Duration : float = 0.0
 
-    OnBegin<override>()<suspends> : void =
+    OnBeginPlay<override>()<suspends> : void =
         Manager.Register(Self)
 
-    OnInteract<override>(Agent : agent) : void = {}
+    OnEndPlay<override>() : void =
+        Manager.Unregister(Self)
 
-    OnInteractProgress<override>(Agent : agent, Progress01 : float) : void = {}
+    OnInteract(Agent : agent) : void = {}
 
-    CanInteract<override>(Agent : agent) : logic = true
+    OnInteractProgress(Agent : agent, Progress01 : float) : void = {}
 
-    GetPromptWidget<override>(Agent : agent) : ?widget = false
+    CanInteract(Agent : agent) : logic = true
 
-    GetInteractionPoint<override>() : vector3 =
-        GetTransform().Translation
+    GetPromptWidget(Agent : agent) : ?widget = false
 
-    GetInteractionRange<override>() : float = Range
+    # Point dans l'espace utilisé par le cone-test du player_interactor.
+    # Par défaut : la position de l'entité porteuse.
+    GetInteractionPoint() : vector3 =
+        if (E := GetEntity[]):
+            E.GetGlobalTransform().Translation
+        else:
+            vector3{X := 0.0, Y := 0.0, Z := 0.0}
 
-    GetInteractionDuration<override>() : float = Duration
+    GetInteractionRange() : float = Range
 
-    OnUnregister<override>() : void = {}
+    GetInteractionDuration() : float = Duration
